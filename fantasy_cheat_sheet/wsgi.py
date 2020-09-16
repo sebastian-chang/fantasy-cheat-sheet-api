@@ -1,5 +1,5 @@
 """
-WSGI config for fantasy-cheat-sheet project.
+WSGI config for fantasy_cheat_sheet project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fantasy-cheat-sheet.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fantasy_cheat_sheet.settings')
 
 application = get_wsgi_application()
