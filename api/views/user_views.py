@@ -20,9 +20,9 @@ class SignUp(generics.CreateAPIView):
 
     def post(self, request):
         # Pass the request data to the serializer to validate it
-        data = UserRegisterSerializer(data=request.data['credentials'])
+        user = UserRegisterSerializer(data=request.data['credentials'])
         # If that data is in the correct format...
-        if data.is_valid():
+        if user.is_valid():
             # Actually create the user using the UserSerializer (the `create` method defined there)
             created_user = UserSerializer(data=user.data)
 

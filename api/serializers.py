@@ -2,12 +2,25 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from .models.mango import Mango
+from .models.sheet import Sheet
+from .models.player import Player
 from .models.user import User
 
 class MangoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mango
         fields = ('id', 'name', 'color', 'ripe', 'owner')
+
+class PlayerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Player
+        fields = ('id', 'first_name', 'last_name', 'position', 'current_team', 'photo_url', 'sheet')
+
+class SheetSerializer(serializers.ModelSerializer):
+    players = PlayerSerializer(many=True, read_only=True)
+    class Meta:
+        model = Sheet
+        fields = ('title', 'owner', 'players')
 
 class UserSerializer(serializers.ModelSerializer):
     # This model serializer will be used for User creation
