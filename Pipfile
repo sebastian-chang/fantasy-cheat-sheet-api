@@ -17,6 +17,7 @@ dj-database-url = "*"
 sqlalchemy = "*"
 pandas = "*"
 requests = "*"
+whitenoise = "*"
 
 [requires]
 python_version = "3.7"
