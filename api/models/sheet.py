@@ -13,3 +13,10 @@ class Sheet(models.Model):
 
     def __str__(self):
         return self.title
+
+    def as_dict(self):
+        """Returns dictionary version of Player models"""
+        return {
+            'id': self.id,
+            'title': self.title
+        }
