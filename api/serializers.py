@@ -20,7 +20,7 @@ class SheetSerializer(serializers.ModelSerializer):
     players = PlayerSerializer(many=True, read_only=True)
     class Meta:
         model = Sheet
-        fields = ('title', 'owner', 'players')
+        fields = ('title', 'owner', 'players', 'id')
 
 class UserSerializer(serializers.ModelSerializer):
     # This model serializer will be used for User creation

@@ -64,26 +64,26 @@ class SheetDetail(generics.RetrieveUpdateDestroyAPIView):
     def partial_update(self, request, pk):
         """Update Request"""
         # Remove owner from request object
-        # This "gets" the owner key on the data['mango'] dictionary
+        # This "gets" the owner key on the data['sheet'] dictionary
         # and returns False if it doesn't find it. So, if it's found we
         # remove it.
         if request.data['sheet'].get('owner', False):
             del request.data['sheet']['owner']
 
-        # Locate Mango
-        # get_object_or_404 returns a object representation of our Mango
+        # Locate Sheet
+        # get_object_or_404 returns a object representation of our Sheet
         sheet = get_object_or_404(Sheet, pk=pk)
         # Check if user is the same as the request.user.id
         if not request.user.id == sheet.owner.id:
-            raise PermissionDenied('Unauthorized, you do not own this mango')
+            raise PermissionDenied('Unauthorized, you do not own this sheet')
 
         # Add owner to data object now that we know this user owns the resource
         request.data['sheet']['owner'] = request.user.id
         # Validate updates with serializer
-        data = SheetSerializer(mango, data=request.data['sheet'])
+        data = SheetSerializer(sheet, data=request.data['sheet'])
         if data.is_valid():
             # Save & send a 204 no content
             data.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'sheet': data.data}, status=status.HTTP_202_ACCEPTED)
         # If the data is not valid, return a response with the errors
         return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
