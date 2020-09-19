@@ -26,11 +26,11 @@ class Sheets(generics.ListCreateAPIView):
         """Create request"""
         # Add user to request data object
         request.data['sheet']['owner'] = request.user.id
-        # Serialize/create mango
+        # Serialize/create cheat shee
         sheet = SheetSerializer(data=request.data['sheet'])
-        # If the mango data is valid according to our serializer...
+        # If the sheet data is valid according to our serializer...
         if sheet.is_valid():
-            # Save the created mango & send a response
+            # Save the created sheet & send a response
             sheet.save()
             return Response({'sheet': sheet.data}, status=status.HTTP_201_CREATED)
         # If the data is not valid, return a response with the errors
@@ -44,7 +44,7 @@ class SheetDetail(generics.RetrieveUpdateDestroyAPIView):
         """Show request"""
         sheet = get_object_or_404(Sheet, pk=pk)
         if not request.user.id == sheet.owner.id:
-            raise PermissionDenied('Unauthorized, you do not own this mango')
+            raise PermissionDenied('Unauthorized, you do not own this sheet')
 
         # Run the data through the serializer so it's formatted
         data = SheetSerializer(sheet).data
@@ -52,11 +52,11 @@ class SheetDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def delete(self, request, pk):
         """Delete request"""
-        # Locate mango to delete
+        # Locate sheet to delete
         sheet = get_object_or_404(Sheet, pk=pk)
-        # Check the mango's owner agains the user making this request
+        # Check the sheet's owner agains the user making this request
         if not request.user.id == sheet.owner.id:
-            raise PermissionDenied('Unauthorized, you do not own this mango')
+            raise PermissionDenied('Unauthorized, you do not own this sheet')
         # Only delete if the user owns the sheet
         sheet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
