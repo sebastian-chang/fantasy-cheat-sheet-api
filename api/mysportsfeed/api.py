@@ -17,8 +17,8 @@ apikey_token = os.getenv('MSF_API')
 engine = create_engine(DB)
 
 # Gets player information from 3rd party API
-def player_info_request(first_name, last_name):
-    pull_url = f'https://api.mysportsfeeds.com/v2.1/pull/nfl/players.json?player={first_name}-{last_name}'
+def player_info_request(first_name, last_name, pos, team):
+    pull_url = f'https://api.mysportsfeeds.com/v2.1/pull/nfl/players.json?player={first_name}-{last_name}&position={pos}&team={team}'
 
     try:
         response = requests.get(
@@ -74,39 +74,56 @@ def clean_stats(data, season):
     return new_data
 
 # Cleans up response data from 3rd party API to fit database tables
-def clean_player(player):
+def clean_player(api_player, user_player):
     new_player = {}
-    new_player['first_name'] = player['firstName']
-    new_player['last_name'] = player['lastName']
-    new_player['position'] = player['primaryPosition']
-    new_player['current_team'] = player['currentTeam']['abbreviation']
-    new_player['photo_url'] = player['officialImageSrc']
-    new_player['MSF_PID'] = player['id']
+    new_player['first_name'] = api_player['firstName']
+    new_player['last_name'] = api_player['lastName']
+    new_player['position'] = api_player['primaryPosition']
+    new_player['current_team'] = api_player['currentTeam']['abbreviation']
+    new_player['photo_url'] = api_player['officialImageSrc']
+    new_player['MSF_PID'] = api_player['id']
+    new_player['id'] = user_player['id']
+    new_player['sheet'] = user_player['sheet']
+    new_player['owner'] = user_player['owner']
 
     return new_player
 
 
-def player_input(first_name, last_name, pos, team):
+def player_input(user_player):
     # Make connection to database and check to see if player already exists
+    print(f"We've made it into the api function call with {user_player['first_name']} the {user_player['current_team']}")
     connection = engine.connect()
     metadata = MetaData(bind=None)
-    table = ('api_player', metadata, autoload=True, autoload_with=engine)
-    query = select([table]).where(and_(
-        table.columns.first_name == first_name,
-        table.columns.last_name == last_name,
-        table.columns.position == pos,
-        table.columns.current_team == team))
-    results = connection.execute(query).fetchall()
+    table = Table('api_qbstat', metadata, autoload=True, autoload_with=engine)
+    # query = select([table]).where(and_(
+    #     table.columns.first_name == first_name,
+    #     table.columns.last_name == last_name,
+    #     table.columns.position == pos,
+    #     table.columns.current_team == team))
+    # results = connection.execute(query).fetchall()
 
-    if len(results) > 0:
-        # Player exists already add just add to user's sheet
-        return
+    api_player = player_info_request(
+        user_player['first_name'], user_player['last_name'], user_player['position'], user_player['current_team'])
+    # player_info = clean_player(player_info)
+    # print(f'this is the player info from the api call {api_player}')
+    # print(f"ength of request is {len(player_info['players'])}")
+    if (len(api_player['players']) == 1):
+        player_info = clean_player(api_player['players'][0]['player'], user_player)
+        print(f"this is now the apied player info {player_info}")
+
+        return player_info
     else:
-        # Player doesn't exist in our local database
-        # Search for player in 3rd party API
-        new_player_info = player_info_request(first_name, last_name)
-        if len(new_player_info['players'] > 0):
-            # Make sure its the correct player were looking for
-        else:
-            # Player isn't found on 3rd party API save user input
-        return
+        return user_player
+
+    # if len(results) > 0:
+    #     # Player exists already add just add to user's sheet
+    #     return
+    # else:
+    #     # Player doesn't exist in our local database
+    #     # Search for player in 3rd party API
+    #     new_player_info = player_info_request(first_name, last_name)
+    #     if len(new_player_info['players'] > 0):
+    #         # Make sure its the correct player were looking for
+    #     else:
+    #         # Player isn't found on 3rd party API save user input
+    #     return

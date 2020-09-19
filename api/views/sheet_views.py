@@ -17,6 +17,7 @@ class Sheets(generics.ListCreateAPIView):
 
     def get(self, request):
         """Index request"""
+        # Filter the sheets by owner, so you can only see your owned sheets
         sheets = Sheet.objects.filter(owner=request.user.id)
         # Run the data through the serializer
         data = SheetSerializer(sheets, many=True).data

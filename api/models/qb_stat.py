@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class QBStats(models.Model):
+class QBStat(models.Model):
     index = models.BigIntegerField(blank=True, null=True)
     week = models.BigIntegerField(blank=True, null=True)
     season = models.BigIntegerField(blank=True, null=True)
@@ -28,4 +28,4 @@ class QBStats(models.Model):
         return 'This is only a test.'
     # class Meta:
     #     managed = False
-    #     db_table = 'qb_stats'
+    #     db_table = 'qb_stat'

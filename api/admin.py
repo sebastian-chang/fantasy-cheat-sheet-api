@@ -2,10 +2,10 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models.user import User
-from .models.mango import Mango
+# from .models.mango import Mango
 from .models.sheet import Sheet
 from .models.player import Player
-from .models.qb_stats import QBStats
+from .models.qb_stat import QBStat
 
 class UserAdmin(BaseUserAdmin):
     ordering = ['id']
@@ -42,7 +42,7 @@ class UserAdmin(BaseUserAdmin):
 # register the model and tell Django to use the above UserAdmin
 # class to format the pages:
 admin.site.register(User, UserAdmin)
-admin.site.register(Mango)
+# admin.site.register(Mango)
 admin.site.register(Sheet)
 admin.site.register(Player)
-admin.site.register(QBStats)
+admin.site.register(QBStat)
