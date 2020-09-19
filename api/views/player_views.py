@@ -90,10 +90,12 @@ class PlayerDetail(generics.RetrieveUpdateDestroyAPIView):
         # Add owner to data object now that we know this user owns the resource
         request.data['player']['owner'] = request.user.id
         # Validate updates with serializer
-        data = PlayerSerializer(player, data=request.data['player'])
+        temp_player = player_input(request.data['player'])
+        # data = PlayerSerializer(player, data=request.data['player'])
+        data = PlayerSerializer(player, data=temp_player)
         if data.is_valid():
             # Save & send a 204 no content
             data.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'player': data.data}, status=status.HTTP_202_ACCEPTED)
         # If the data is not valid, return a response with the errors
         return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)

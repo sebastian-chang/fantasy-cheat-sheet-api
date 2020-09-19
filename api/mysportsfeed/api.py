@@ -113,6 +113,8 @@ def player_input(user_player):
 
         return player_info
     else:
+        user_player['photo_url'] = ''
+        user_player['MSF_PID'] = 0
         return user_player
 
     # if len(results) > 0:
