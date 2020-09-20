@@ -17,6 +17,8 @@ apikey_token = os.getenv('MSF_API')
 engine = create_engine(DB)
 
 # Gets player information from 3rd party API
+
+
 def player_info_request(first_name, last_name, pos, team):
     pull_url = f'https://api.mysportsfeeds.com/v2.1/pull/nfl/players.json?player={first_name}-{last_name}&position={pos}&team={team}'
 
@@ -32,6 +34,8 @@ def player_info_request(first_name, last_name, pos, team):
         print('HTTP Request failed getting player info')
 
 # Gets player game stats from 3rd party API
+
+
 def player_stats_request(first_name, last_name, year):
     pull_url = f'https://api.mysportsfeeds.com/v2.1/pull/nfl/{year}-regular/player_gamelogs.json?player={first_name}-{last_name}'
 
@@ -47,6 +51,8 @@ def player_stats_request(first_name, last_name, year):
         print('HTTP Request failed getting player stats')
 
 # Cleans up response data from 3rd party API to fit database tables with stats needed for given player
+
+
 def clean_stats(data, season):
     new_data = []
 
@@ -74,6 +80,8 @@ def clean_stats(data, season):
     return new_data
 
 # Cleans up response data from 3rd party API to fit database tables
+
+
 def clean_player(api_player, user_player):
     new_player = {}
     new_player['first_name'] = api_player['firstName']
@@ -82,6 +90,11 @@ def clean_player(api_player, user_player):
     new_player['current_team'] = api_player['currentTeam']['abbreviation']
     new_player['photo_url'] = api_player['officialImageSrc']
     new_player['MSF_PID'] = api_player['id']
+    new_player['jersey_number'] = api_player['jerseyNumber']
+    new_player['height'] = api_player['height']
+    new_player['weight'] = api_player['weight']
+    new_player['age'] = api_player['age']
+    new_player['dob'] = api_player['birthDate']
     new_player['id'] = user_player['id']
     new_player['sheet'] = user_player['sheet']
     new_player['owner'] = user_player['owner']
@@ -91,7 +104,8 @@ def clean_player(api_player, user_player):
 
 def player_input(user_player):
     # Make connection to database and check to see if player already exists
-    print(f"We've made it into the api function call with {user_player['first_name']} the {user_player['current_team']}")
+    print(
+        f"We've made it into the api function call with {user_player['first_name']} the {user_player['current_team']}")
     connection = engine.connect()
     metadata = MetaData(bind=None)
     table = Table('api_qbstat', metadata, autoload=True, autoload_with=engine)
@@ -105,16 +119,25 @@ def player_input(user_player):
     api_player = player_info_request(
         user_player['first_name'], user_player['last_name'], user_player['position'], user_player['current_team'])
     # player_info = clean_player(player_info)
-    # print(f'this is the player info from the api call {api_player}')
+    # print(f"this is the player info from the api call {api_player['references']['teamReferences'][0]['city']}")
     # print(f"ength of request is {len(player_info['players'])}")
     if (len(api_player['players']) == 1):
-        player_info = clean_player(api_player['players'][0]['player'], user_player)
-        print(f"this is now the apied player info {player_info}")
-
+        player_info = clean_player(
+            api_player['players'][0]['player'], user_player)
+        player_info['city_team'] = api_player['references']['teamReferences'][0]['city'] + \
+            ' ' + api_player['references']['teamReferences'][0]['name']
+        player_info['team_logo'] = api_player['references']['teamReferences'][0]['officialLogoImageSrc']
         return player_info
     else:
-        user_player['photo_url'] = ''
+        user_player['photo_url'] = 'https://www.oseyo.co.uk/wp-content/uploads/2020/05/empty-profile-picture-png-2.png'
         user_player['MSF_PID'] = 0
+        user_player['jersey_number'] = 0
+        user_player['height'] = ''
+        user_player['weight'] = 0
+        user_player['age'] = 0
+        user_player['dob'] = ''
+        user_player['city_team'] = ''
+        user_player['team_logo'] = ''
         return user_player
 
     # if len(results) > 0:
