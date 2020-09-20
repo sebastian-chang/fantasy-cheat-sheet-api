@@ -13,15 +13,14 @@ if os.getenv('ENV') == 'development':
 else:
     DB = 'something else'
 apikey_token = os.getenv('MSF_API')
-
 engine = create_engine(DB)
 
+
 # Gets player information from 3rd party API
-
-
 def player_info_request(first_name, last_name, pos, team):
     pull_url = f'https://api.mysportsfeeds.com/v2.1/pull/nfl/players.json?player={first_name}-{last_name}&position={pos}&team={team}'
 
+    # Attempt to get player info from My Sports Feed
     try:
         response = requests.get(
             url=pull_url,
@@ -33,12 +32,12 @@ def player_info_request(first_name, last_name, pos, team):
     except requests.exceptions.RequestException:
         print('HTTP Request failed getting player info')
 
+
 # Gets player game stats from 3rd party API
-
-
 def player_stats_request(first_name, last_name, year):
     pull_url = f'https://api.mysportsfeeds.com/v2.1/pull/nfl/{year}-regular/player_gamelogs.json?player={first_name}-{last_name}'
 
+    # Attempts to get player stats from My Sports Feed
     try:
         response = requests.get(
             url=pull_url,
@@ -50,9 +49,8 @@ def player_stats_request(first_name, last_name, year):
     except requests.exceptions.RequestException:
         print('HTTP Request failed getting player stats')
 
+
 # Cleans up response data from 3rd party API to fit database tables with stats needed for given player
-
-
 def clean_stats(data, season):
     new_data = []
 
@@ -79,11 +77,12 @@ def clean_stats(data, season):
 
     return new_data
 
+
 # Cleans up response data from 3rd party API to fit database tables
-
-
 def clean_player(api_player, user_player):
+    # Creates an empty dictionary to store data into
     new_player = {}
+    # Takes data from 3rd party data
     new_player['first_name'] = api_player['firstName']
     new_player['last_name'] = api_player['lastName']
     new_player['position'] = api_player['primaryPosition']
@@ -95,6 +94,7 @@ def clean_player(api_player, user_player):
     new_player['weight'] = api_player['weight']
     new_player['age'] = api_player['age']
     new_player['dob'] = api_player['birthDate']
+    # Adds additional information from our database to obeject
     new_player['id'] = user_player['id']
     new_player['sheet'] = user_player['sheet']
     new_player['owner'] = user_player['owner']
@@ -102,32 +102,40 @@ def clean_player(api_player, user_player):
     return new_player
 
 
+# Calls 3rd party API and formats data for storage in our database
 def player_input(user_player):
+    # print(
+    #     f"We've made it into the api function call with {user_player['first_name']} the {user_player['current_team']}")
+
     # Make connection to database and check to see if player already exists
-    print(
-        f"We've made it into the api function call with {user_player['first_name']} the {user_player['current_team']}")
     connection = engine.connect()
     metadata = MetaData(bind=None)
     table = Table('api_qbstat', metadata, autoload=True, autoload_with=engine)
-    # query = select([table]).where(and_(
-    #     table.columns.first_name == first_name,
-    #     table.columns.last_name == last_name,
-    #     table.columns.position == pos,
-    #     table.columns.current_team == team))
-    # results = connection.execute(query).fetchall()
 
+    # Creates a dictionary from the response data of 3rd party API
     api_player = player_info_request(
         user_player['first_name'], user_player['last_name'], user_player['position'], user_player['current_team'])
     # player_info = clean_player(player_info)
     # print(f"this is the player info from the api call {api_player['references']['teamReferences'][0]['city']}")
     # print(f"ength of request is {len(player_info['players'])}")
+
+    # Checks to see if we found the player user was looking for
     if (len(api_player['players']) == 1):
+        # Adds additional info not located in player response
         player_info = clean_player(
             api_player['players'][0]['player'], user_player)
         player_info['city_team'] = api_player['references']['teamReferences'][0]['city'] + \
             ' ' + api_player['references']['teamReferences'][0]['name']
         player_info['team_logo'] = api_player['references']['teamReferences'][0]['officialLogoImageSrc']
+
+        # Check to see if player stats are stored in our local database.  If not fetch data to store
+        # query = select([table]).where()
+        # results = connection.execute(query).fetchall()
+
+        # Return player dictionary to be stored to local database through Django serializer
         return player_info
+
+    # If player isn't located remove or blank out data from 3rd party API
     else:
         user_player['photo_url'] = 'https://www.oseyo.co.uk/wp-content/uploads/2020/05/empty-profile-picture-png-2.png'
         user_player['MSF_PID'] = 0
@@ -139,16 +147,3 @@ def player_input(user_player):
         user_player['city_team'] = ''
         user_player['team_logo'] = ''
         return user_player
-
-    # if len(results) > 0:
-    #     # Player exists already add just add to user's sheet
-    #     return
-    # else:
-    #     # Player doesn't exist in our local database
-    #     # Search for player in 3rd party API
-    #     new_player_info = player_info_request(first_name, last_name)
-    #     if len(new_player_info['players'] > 0):
-    #         # Make sure its the correct player were looking for
-    #     else:
-    #         # Player isn't found on 3rd party API save user input
-    #     return

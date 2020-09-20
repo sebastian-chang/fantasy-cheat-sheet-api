@@ -4,6 +4,7 @@ from rest_framework import serializers
 # from .models.mango import Mango
 from .models.sheet import Sheet
 from .models.player import Player
+from .models.qb_stat import QBStat
 from .models.user import User
 
 
@@ -21,6 +22,15 @@ class SheetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sheet
         fields = ('title', 'owner', 'players', 'id')
+
+class QBStatsSerializer(serializers.ModelSerializer):
+    # players = PlayerSerializer(many=True, read_only=True)
+    class Meta:
+        model = QBStat
+        fields = ('id', 'pid', 'week', 'season', 'opponent',
+                  'passattempts', 'passattempts', 'passcompletions', 'passpct', 'passyards',
+                  'passavg', 'passyardsperatt', 'passtd', 'passint', 'passlng', 'passsacks',
+                  'pass20plus', 'pass40plus', 'qbrating')
 
 
 class UserSerializer(serializers.ModelSerializer):

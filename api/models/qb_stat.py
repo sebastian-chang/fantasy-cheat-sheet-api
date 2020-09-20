@@ -3,6 +3,7 @@ from django.db import models
 
 class QBStat(models.Model):
     index = models.BigIntegerField(blank=True, null=True)
+    pid = models.IntegerField(blank=True, null=True)
     week = models.BigIntegerField(blank=True, null=True)
     season = models.BigIntegerField(blank=True, null=True)
     homeoraway = models.TextField(db_column='HomeOrAway', blank=True, null=True)
@@ -25,7 +26,7 @@ class QBStat(models.Model):
     qbrating = models.FloatField(db_column='qbRating', blank=True, null=True)
 
     def __str__(self):
-        return 'This is only a test.'
+        return f'{self.season} - Week {self.week} for player id {self.pid}'
     # class Meta:
     #     managed = False
     #     db_table = 'qb_stat'
