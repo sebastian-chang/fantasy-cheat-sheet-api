@@ -19,6 +19,6 @@ urlpatterns = [
     path('change-pw/', ChangePassword.as_view(), name='change-pw'),
 
     # Player views for data from 3rd party API
-    path('qb-stat/<int:pk>', QBStatDetails.as_view, name='qb-stat'),
+    path('qb-stat/<int:pk>', QBStatDetails.as_view(), name='qb-stat'),
     path('qb-stat/', QBStats.as_view(), name='qb-stats')
 ]
