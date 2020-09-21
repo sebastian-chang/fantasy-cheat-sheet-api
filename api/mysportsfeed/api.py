@@ -13,6 +13,7 @@ if os.getenv('ENV') == 'development':
     DB = 'postgresql://localhost:5432/' + os.getenv('DB_NAME_DEV')
 else:
     DB = dj_database_url.config()
+    print(dj_database_url.config())
 apikey_token = os.getenv('MSF_API')
 engine = create_engine(DB)
 
