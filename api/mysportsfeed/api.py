@@ -4,16 +4,18 @@ import os
 import base64
 import requests
 
-from sqlalchemy import create_engine, MetaData, Table, and_
-from sqlalchemy.sql import select
+# from sqlalchemy import create_engine, MetaData, Table, and_
+# from sqlalchemy.sql import select
+
+from ..models.qb_stat import QBStat
+apikey_token = os.getenv('MSF_API')
 
 # Determine if we are on local or production
-if os.getenv('ENV') == 'development':
-    DB = 'postgresql://localhost:5432/' + os.getenv('DB_NAME_DEV')
-else:
-    DB = 'something else'
-apikey_token = os.getenv('MSF_API')
-engine = create_engine(DB)
+# if os.getenv('ENV') == 'development':
+#     DB = 'postgresql://localhost:5432/' + os.getenv('DB_NAME_DEV')
+# else:
+#     DB = 'something else'
+# engine = create_engine(DB)
 
 
 # Gets player information from 3rd party API
@@ -108,10 +110,10 @@ def player_input(user_player):
     #     f"We've made it into the api function call with {user_player['first_name']} the {user_player['current_team']}")
 
     # Make connection to database and check to see if player already exists
-    connection = engine.connect()
-    metadata = MetaData(bind=None)
+    # connection = engine.connect()
+    # metadata = MetaData(bind=None)
     # only qb stats working now
-    table = Table('api_qbstat', metadata, autoload=True, autoload_with=engine)
+    # table = Table('api_qbstat', metadata, autoload=True, autoload_with=engine)
 
     # Creates a dictionary from the response data of 3rd party API
     api_player = player_info_request(
@@ -129,9 +131,10 @@ def player_input(user_player):
             ' ' + api_player['references']['teamReferences'][0]['name']
         player_info['team_logo'] = api_player['references']['teamReferences'][0]['officialLogoImageSrc']
         # Checks to see if player has stats
-        sel = select([table]).where(table.columns.pid == player_info['MSF_PID'])
-        results = connection.execute(sel).fetchall()
-        if(len(results) > 0):
+        player_stats = list(QBStat.objects.filter(pid=player_info['MSF_PID']))
+        # sel = select([table]).where(table.columns.pid == player_info['MSF_PID'])
+        # results = connection.execute(sel).fetchall()
+        if(len(player_stats) > 0):
             player_info['has_stats'] = True
 
         # Check to see if player stats are stored in our local database.  If not fetch data to store
