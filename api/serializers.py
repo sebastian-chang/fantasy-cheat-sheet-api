@@ -46,7 +46,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ('id', 'email', 'password')
         # change back to 5 for password length
-        extra_kwargs = {'password': {'write_only': True, 'min_length': 1}}
+        extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
 
     # This create method will be used for model creation
     def create(self, validated_data):
