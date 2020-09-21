@@ -7,7 +7,7 @@ Something something something.
 - [GitHub API Repo](https://github.com/sebastian-chang/fantasy-cheat-sheet-api)
 - [Deployed API](https://fantasy-backend-cheat-sheet.herokuapp.com/)
 - [GitHub Repo](https://github.com/sebastian-chang/fantasy-cheat-sheet)
-- [Deployed Client](https://worldwide-coders.github.io/educational-store/#/)
+- [Deployed Client](https://sebastian-chang.github.io/fantasy-cheat-sheet/#/)
 
 ## Planning Story
 
@@ -41,6 +41,7 @@ Something something something.
 | PATCH  | `/players/:id/`        | `players#update`            | `true`          |
 | DELETE | `/players/:id/`        | `players#delete`            | `true`          |
 | GET    | `/qb-stat/:id/`        | `qbstat#show`               | `true`          |
+| POST   | `/qb-stat/`            | `qbstat#create`             | `true`          |
 
 All data returned from API actions is formatted as JSON.
 
@@ -65,6 +66,6 @@ All data returned from API actions is formatted as JSON.
 
 ### ERD
 
-<!-- ![ERD](https://i.imgur.com/iwe6nV4.png) -->
+![ERD](https://github.com/sebastian-chang/fantasy-cheat-sheet-api/blob/master/public/img/Capstone-ERD.jpg)
 
 ---

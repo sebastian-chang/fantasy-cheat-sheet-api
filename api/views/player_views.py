@@ -35,7 +35,6 @@ class Players(generics.ListCreateAPIView):
         # If the player data is valid according to our serializer...
         if player.is_valid():
             # Save the created player & send a response
-            print('player ', player)
             player.save()
             return Response({'player': player.data}, status=status.HTTP_201_CREATED)
         # If the data is not valid, return a response with the errors

@@ -38,7 +38,6 @@ class QBStats(generics.CreateAPIView):
         weeks = len(player_stats)
         for player_stat in player_stats:
             stat = QBStatsSerializer(data=player_stat)
-            print('what is one stat', stat)
             if stat.is_valid():
                 stat.save()
                 check += 1
