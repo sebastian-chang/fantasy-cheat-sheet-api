@@ -21,7 +21,6 @@ class Players(generics.ListCreateAPIView):
         """Index request"""
         # Filter the players by owner, so you can only see your owned players
         players = Player.objects.filter(owner=request.user.id)
-        # players = Player.objects.all()
         # Run the data through the serializer
         data = PlayerSerializer(players, many=True).data
         return Response({'players': data})
@@ -31,14 +30,12 @@ class Players(generics.ListCreateAPIView):
         # Add user to request data object
         request.data['player']['owner'] = request.user.id
         # Serialize/create player
-        # player = PlayerSerializer(data=request.data['player'])
-        temp_player = player_input(request.data['player'])
-        # print(f"this is from the OG  player before the save {temp_player}")
-        player = PlayerSerializer(data=temp_player)
-        # print(f"this is the fetched data {player}")
+        player_info = player_input(request.data['player'])
+        player = PlayerSerializer(data=player_info)
         # If the player data is valid according to our serializer...
         if player.is_valid():
             # Save the created player & send a response
+            print('player ', player)
             player.save()
             return Response({'player': player.data}, status=status.HTTP_201_CREATED)
         # If the data is not valid, return a response with the errors

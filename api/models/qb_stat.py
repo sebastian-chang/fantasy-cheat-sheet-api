@@ -27,6 +27,3 @@ class QBStat(models.Model):
 
     def __str__(self):
         return f'{self.season} - Week {self.week} for player id {self.pid}'
-    # class Meta:
-    #     managed = False
-    #     db_table = 'qb_stat'

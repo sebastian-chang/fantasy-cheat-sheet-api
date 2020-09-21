@@ -27,7 +27,7 @@ class Sheets(generics.ListCreateAPIView):
         """Create request"""
         # Add user to request data object
         request.data['sheet']['owner'] = request.user.id
-        # Serialize/create cheat shee
+        # Serialize/create cheat sheet
         sheet = SheetSerializer(data=request.data['sheet'])
         # If the sheet data is valid according to our serializer...
         if sheet.is_valid():

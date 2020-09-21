@@ -1,23 +1,11 @@
 import pandas as pd
 import math
 import os
-import dj_database_url
 import base64
 import requests
 
-# from sqlalchemy import create_engine, MetaData, Table, and_
-# from sqlalchemy.sql import select
-
 from ..models.qb_stat import QBStat
 apikey_token = os.getenv('MSF_API')
-
-# Determine if we are on local or production
-# if os.getenv('ENV') == 'development':
-#     DB = 'postgresql://localhost:5432/' + os.getenv('DB_NAME_DEV')
-# else:
-#     DB = 'something else'
-# engine = create_engine(DB)
-
 
 # Gets player information from 3rd party API
 def player_info_request(first_name, last_name, pos, team):
@@ -37,8 +25,8 @@ def player_info_request(first_name, last_name, pos, team):
 
 
 # Gets player game stats from 3rd party API
-def player_stats_request(first_name, last_name, year):
-    pull_url = f'https://api.mysportsfeeds.com/v2.1/pull/nfl/{year}-regular/player_gamelogs.json?player={first_name}-{last_name}'
+def player_stats_request(pid, year):
+    pull_url = f'https://api.mysportsfeeds.com/v2.1/pull/nfl/{year}-regular/player_gamelogs.json?player={pid}'
 
     # Attempts to get player stats from My Sports Feed
     try:
@@ -54,28 +42,32 @@ def player_stats_request(first_name, last_name, year):
 
 
 # Cleans up response data from 3rd party API to fit database tables with stats needed for given player
-def clean_stats(data, season):
+def clean_stats(data, season, msf_pid):
+    # Create a blank array for player season stats
     new_data = []
 
     # Go through each week of the season player played
     for i in range(len(data)):
         new_dict = {}
         player_team = data[i]['team']['abbreviation']
+        new_dict['pid'] = msf_pid
         new_dict['week'] = data[i]['game']['week']
         new_dict['season'] = season
 
         # Check to see if player was home or away team.  Also set the opponent played
         if(player_team == data[i]['game']['homeTeamAbbreviation']):
-            new_dict['HomeOrAway'] = 'HOME'
-            new_dict['Opponent'] = data[i]['game']['awayTeamAbbreviation']
+            new_dict['homeoraway'] = 'HOME'
+            new_dict['opponent'] = data[i]['game']['awayTeamAbbreviation']
         else:
-            new_dict['HomeOrAway'] = 'AWAY'
-            new_dict['Opponent'] = data[i]['game']['homeTeamAbbreviation']
+            new_dict['homeoraway'] = 'AWAY'
+            new_dict['opponent'] = data[i]['game']['homeTeamAbbreviation']
 
         # Add passing stats to QB object
         for stat, value in data[i]['stats']['passing'].items():
-            new_dict[stat] = value
+            # Must use lowercase lettering for django models
+            new_dict[stat.lower()] = value
 
+        # Add the week's data into the seasons array
         new_data.append(new_dict)
 
     return new_data
@@ -105,23 +97,11 @@ def clean_player(api_player, user_player):
     return new_player
 
 
-# Calls 3rd party API and formats data for storage in our database
+# Calls 3rd party API for player info and formats data for storage in our database
 def player_input(user_player):
-    # print(
-    #     f"We've made it into the api function call with {user_player['first_name']} the {user_player['current_team']}")
-
-    # Make connection to database and check to see if player already exists
-    # connection = engine.connect()
-    # metadata = MetaData(bind=None)
-    # only qb stats working now
-    # table = Table('api_qbstat', metadata, autoload=True, autoload_with=engine)
-
     # Creates a dictionary from the response data of 3rd party API
     api_player = player_info_request(
         user_player['first_name'], user_player['last_name'], user_player['position'], user_player['current_team'])
-    # player_info = clean_player(player_info)
-    # print(f"this is the player info from the api call {api_player['references']['teamReferences'][0]['city']}")
-    # print(f"ength of request is {len(player_info['players'])}")
 
     # Checks to see if we found the player user was looking for
     if (len(api_player['players']) == 1):
@@ -131,17 +111,10 @@ def player_input(user_player):
         player_info['city_team'] = api_player['references']['teamReferences'][0]['city'] + \
             ' ' + api_player['references']['teamReferences'][0]['name']
         player_info['team_logo'] = api_player['references']['teamReferences'][0]['officialLogoImageSrc']
-        # Checks to see if player has stats
+        # Check to see if player stats are stored in our local database.  If not fetch data to store
         player_stats = list(QBStat.objects.filter(pid=player_info['MSF_PID']))
-        # sel = select([table]).where(table.columns.pid == player_info['MSF_PID'])
-        # results = connection.execute(sel).fetchall()
         if(len(player_stats) > 0):
             player_info['has_stats'] = True
-
-        # Check to see if player stats are stored in our local database.  If not fetch data to store
-        # query = select([table]).where()
-        # results = connection.execute(query).fetchall()
-
         # Return player dictionary to be stored to local database through Django serializer
         return player_info
 
@@ -158,3 +131,9 @@ def player_input(user_player):
         user_player['team_logo'] = ''
         user_player['has_stats'] = False
         return user_player
+
+# Calls 3rd party API for player stats and formats data for storage in database
+def player_stat_input(pid, year):
+    player_response = player_stats_request(pid, year)
+    player_stats = clean_stats(player_response['gamelogs'], year, pid)
+    return(player_stats)

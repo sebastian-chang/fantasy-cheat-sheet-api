@@ -9,6 +9,7 @@ from .models.user import User
 
 
 class PlayerSerializer(serializers.ModelSerializer):
+    # This model serializer is for player information
     class Meta:
         model = Player
         fields = ('id', 'first_name', 'last_name', 'position',
@@ -17,6 +18,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 
 
 class SheetSerializer(serializers.ModelSerializer):
+    # This model serializer is for user's cheat sheets
     players = PlayerSerializer(many=True, read_only=True)
 
     class Meta:
@@ -24,12 +26,13 @@ class SheetSerializer(serializers.ModelSerializer):
         fields = ('title', 'owner', 'players', 'id')
 
 class QBStatsSerializer(serializers.ModelSerializer):
-    # players = PlayerSerializer(many=True, read_only=True)
+    # This model serializer is for player seasonal stats
     class Meta:
         model = QBStat
-        fields = ('id', 'pid', 'week', 'season', 'opponent',
+        fields = ('id', 'pid', 'week', 'season', 'opponent', 'homeoraway',
                   'passattempts', 'passattempts', 'passcompletions', 'passpct', 'passyards',
                   'passavg', 'passyardsperatt', 'passtd', 'passint', 'passlng', 'passsacks',
+                  'passtdpct', 'passintpct',
                   'pass20plus', 'pass40plus', 'qbrating')
 
 
