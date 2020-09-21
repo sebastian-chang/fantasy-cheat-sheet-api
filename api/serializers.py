@@ -13,7 +13,7 @@ class PlayerSerializer(serializers.ModelSerializer):
         model = Player
         fields = ('id', 'first_name', 'last_name', 'position',
                   'height', 'weight', 'dob', 'age', 'city_team', 'team_logo',
-                  'jersey_number', 'current_team', 'photo_url', 'MSF_PID', 'sheet', 'owner')
+                  'jersey_number', 'current_team', 'photo_url', 'MSF_PID', 'has_stats', 'sheet', 'owner')
 
 
 class SheetSerializer(serializers.ModelSerializer):

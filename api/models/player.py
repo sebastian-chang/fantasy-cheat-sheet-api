@@ -16,8 +16,9 @@ class Player(models.Model):
     age = models.IntegerField(blank=True)
     city_team = models.CharField(max_length=100, blank=True)
     team_logo = models.CharField(max_length=200, blank=True)
-    photo_url=models.CharField(max_length=200, blank=True)
-    MSF_PID=models.IntegerField(null=True)
+    photo_url = models.CharField(max_length=200, blank=True)
+    MSF_PID = models.IntegerField(null=True)
+    has_stats = models.BooleanField(default=False)
     owner=models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE

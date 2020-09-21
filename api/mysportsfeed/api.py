@@ -110,6 +110,7 @@ def player_input(user_player):
     # Make connection to database and check to see if player already exists
     connection = engine.connect()
     metadata = MetaData(bind=None)
+    # only qb stats working now
     table = Table('api_qbstat', metadata, autoload=True, autoload_with=engine)
 
     # Creates a dictionary from the response data of 3rd party API
@@ -127,6 +128,11 @@ def player_input(user_player):
         player_info['city_team'] = api_player['references']['teamReferences'][0]['city'] + \
             ' ' + api_player['references']['teamReferences'][0]['name']
         player_info['team_logo'] = api_player['references']['teamReferences'][0]['officialLogoImageSrc']
+        # Checks to see if player has stats
+        sel = select([table]).where(table.columns.pid == player_info['MSF_PID'])
+        results = connection.execute(sel).fetchall()
+        if(len(results) > 0):
+            player_info['has_stats'] = True
 
         # Check to see if player stats are stored in our local database.  If not fetch data to store
         # query = select([table]).where()
@@ -146,4 +152,5 @@ def player_input(user_player):
         user_player['dob'] = ''
         user_player['city_team'] = ''
         user_player['team_logo'] = ''
+        user_player['has_stats'] = False
         return user_player

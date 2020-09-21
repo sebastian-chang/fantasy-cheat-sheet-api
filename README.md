@@ -65,6 +65,6 @@ All data returned from API actions is formatted as JSON.
 
 ### ERD
 
-![ERD](https://i.imgur.com/iwe6nV4.png)
+<!-- ![ERD](https://i.imgur.com/iwe6nV4.png) -->
 
 ---
