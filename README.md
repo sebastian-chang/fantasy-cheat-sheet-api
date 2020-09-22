@@ -7,7 +7,7 @@ Graph visualizations of those stats for easy understanding of players performanc
 
 - [GitHub API Repo](https://github.com/sebastian-chang/fantasy-cheat-sheet-api)
 - [Deployed API](https://fantasy-backend-cheat-sheet.herokuapp.com/)
-- [GitHub Repo](https://github.com/sebastian-chang/fantasy-cheat-sheet)
+- [GitHub Client Repo](https://github.com/sebastian-chang/fantasy-cheat-sheet)
 - [Deployed Client](https://sebastian-chang.github.io/fantasy-cheat-sheet/#/)
 
 ## Installation
