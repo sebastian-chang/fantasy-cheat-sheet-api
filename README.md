@@ -1,6 +1,7 @@
 # Educational-Store-API: A Description
 
-Something something something.
+An application that can help aid a user with the selection of a NFL player in their fantasy leagues. A user would be able to see stats from previous seasons.
+Graph visualizations of those stats for easy understanding of players performances.  Ideally this could access a player's current season and could work in all leagues for all sports around the world.
 
 ## Important Links
 
@@ -8,6 +9,19 @@ Something something something.
 - [Deployed API](https://fantasy-backend-cheat-sheet.herokuapp.com/)
 - [GitHub Repo](https://github.com/sebastian-chang/fantasy-cheat-sheet)
 - [Deployed Client](https://sebastian-chang.github.io/fantasy-cheat-sheet/#/)
+
+## Installation
+
+1. Download zip.
+2. Unzip the application.
+3. Change directories into `fantasy-cheat-sheet-api-master`.
+4. Change into your favorite python virual environment.
+5. Install all dependencies `pip install` or `pipenv install`.
+6. Create a postgres database.
+    - Run `psql settings.sql`.
+7. Generate and run migrations with `python3 manage.py makemigrations` and `python3 manage.py migrate`.
+8. Create super user with `python3 manage.py createsuperuser` follow prompts.
+9. Run the server with `python3 manage.py runserver`
 
 ## Planning Story
 
