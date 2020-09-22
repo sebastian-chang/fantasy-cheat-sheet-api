@@ -1,4 +1,4 @@
-# Educational-Store-API: A Description
+# Fantasy Cheat Sheet API: A Description
 
 An application that can help aid a user with the selection of a NFL player in their fantasy leagues. A user would be able to see stats from previous seasons.
 Graph visualizations of those stats for easy understanding of players performances.  Ideally this could access a player's current season and could work in all leagues for all sports around the world.
